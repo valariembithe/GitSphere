@@ -62,7 +62,7 @@ client_secret = "8bce57a36f74e7d208ac040b67df5db1e3bc3f36"
 redirect_uri = "https://github.com/valariembithe/Git_Spy_v2"
 code = ""
 
-token_response = generate_access_token(CLIENT_ID, client_secret, redirect_uri, code)
+token_response = generate_access_token(client_id, client_secret, redirect_uri, code)
 print(token_response)
 
 def parse_response(response):
