@@ -1,15 +1,13 @@
 #!/usr/bin/python3
-""" Creating  a CLI with client_id"""
+""" Creating  a Command Line Interface with client_id"""
 
 from json import JSONDecoder
 from json import JSONEncoder
 from json import JSONDecodeError
 import json
 import sys
-import urllib.parse
-import urllib.request
-
-
+from urllib.parse import urlencode
+from urllib.request import urlopen, Request 
 
 
 def generate_authorization_url(client_id, redirect_uri, state):
@@ -20,14 +18,14 @@ def generate_authorization_url(client_id, redirect_uri, state):
         "redirect_uri": redirect_uri,
         "state": state
     }
-    auth_url = f"{base_url}?{urllib.parse.urlencode(params)}"
+    auth_url = f"{base_url}?{urlencode(params)}"
     return auth_url
 
 client_id = "Iv1.84422fa8f410b93b"
 state = "creatingagithubapp"
 redirect_uri = "https://github.com/valariembithe/Git_Spy_v2"
 
-authorization_url = generate_authorization_url(client_id,redirect_uri, state)
+authorization_url = generate_authorization_url(client_id, redirect_uri, state)
 print(authorization_url)
 
 
@@ -45,7 +43,9 @@ def generate_access_token(client_id, client_secret, redirect_uri, code):
         "Accept": "application/json"
     }
 
-    response = urllib.request.post(url, data=data, headers=headers)
+    req = Request(url, urlencode(data).encode(), headers)
+    response = urlopen(req).read().decode()
+
     try:
         response.status_code()
         parsed_response = response.json()
