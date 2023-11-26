@@ -54,7 +54,7 @@ def generate_access_token(client_id, client_secret, redirect_uri, code):
             return parsed_response
         else:
             raise ValueError("Response does not contain a valid access token.")
-    except urllib.request.HTTPError as http_err:
+    except Request.HTTPError as http_err:
         raise http_err
     
 client_id = "Iv1.84422fa8f410b93b"
