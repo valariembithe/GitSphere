@@ -8,6 +8,8 @@ import json
 import sys
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request 
+import urllib.response
+import urllib.request
 
 
 def generate_authorization_url(client_id, redirect_uri, state):
@@ -47,14 +49,14 @@ def generate_access_token(client_id, client_secret, redirect_uri, code):
     response = urlopen(req).read().decode()
 
     try:
-        response.status_code()
+        response.raise_for_status()
         parsed_response = response.json()
 
         if "access_token" in parsed_response:
             return parsed_response
         else:
             raise ValueError("Response does not contain a valid access token.")
-    except Request.HTTPError as http_err:
+    except urllib.request.HTTPError as http_err:
         raise http_err
     
 client_id = "Iv1.84422fa8f410b93b"
