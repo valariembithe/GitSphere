@@ -49,7 +49,7 @@ def generate_access_token(client_id, client_secret, redirect_uri, code):
     response = urlopen(req).read().decode()
 
     try:
-        response.raise_for_status()
+        """response.raise_for_status()"""
         parsed_response = response.json()
 
         if "access_token" in parsed_response:
