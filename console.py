@@ -93,5 +93,3 @@ def main():
 if __name__ == "__main__":
     app.run(host=host, port=port, threaded=True)
     app.run(debug=True)
-    
-    main()
