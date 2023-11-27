@@ -26,11 +26,6 @@ app.route('/')
 def home():
     return f'<a href="{github_authorize_url}">Authorize with GitHub</a>'
 
-app.route('/callback')
-def callback(received_code):
-    token_response = generate_access_token(client_id, client_secret, redirect_uri, received_code)
-
-    return f"Token response: {token_response}"
 
 def generate_access_token(client_id, client_secret, redirect_uri, received_code):
     """ Generates user access token to use during making API requests on 
@@ -53,7 +48,7 @@ def generate_access_token(client_id, client_secret, redirect_uri, received_code)
 
     try:
         """response.raise_for_status()"""
-        parsed_response = response.json()
+        parsed_response = response.json(response)
 
         if "access_token" in parsed_response:
             return parsed_response
