@@ -1,50 +1,53 @@
 #!/usr/bin/python3
 """ Creating  a Command Line Interface with client_id"""
-
+import flask
+from flask import Flask, request, redirect
 from json import JSONDecoder
 from json import JSONEncoder
 from json import JSONDecodeError
 import json
 import sys
+import requests
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request 
-import urllib.response
 import urllib.request
 
 
-def generate_authorization_url(client_id, redirect_uri, state):
-    """ Generates a authorization url"""
-    base_url = "https://github.com/login/oauth/authorize"
-    params = {
-        "client_id": client_id,
-        "redirect_uri": redirect_uri,
-        "state": state
-    }
-    auth_url = f"{base_url}?{urlencode(params)}"
-    return auth_url
+app = Flask(__name__)
 
 client_id = "Iv1.84422fa8f410b93b"
+client_secret = "8bce57a36f74e7d208ac040b67df5db1e3bc3f36"
 state = "creatingagithubapp"
-redirect_uri = "https://github.com/valariembithe/Git_Spy_v2"
+redirect_uri = "https://github.com/valariembithe?tab=repositories"
 
-authorization_url = generate_authorization_url(client_id, redirect_uri, state)
-print(authorization_url)
+github_authorize_url = f"https://github.com/login/oauth/authorize?
+                    client_id={client_id}&redirect_uri={redirect_uri}&state={state}"
+app.route('/')
+def home():
+    return f'<a href="{github_authorize_url}">Authorize with GitHub</a>'
 
+app.route('/callback')
+def callback(received_code):
+    token_response = generate_access_token(client_id, client_secret, redirect_uri, received_code)
 
-def generate_access_token(client_id, client_secret, redirect_uri, code):
+    return f"Token response: {token_response}"
+
+def generate_access_token(client_id, client_secret, redirect_uri, received_code):
     """ Generates user access token to use during making API requests on 
         behalf of a user"""
+    received_code = requests.get('code')
     url = "https://github.com/login/oauth/access_token"
     data = {
         "client_id": client_id,
         "client-secret": client_secret,
-        "code": code,
+        "code": received_code,
         "redirect_uri": redirect_uri
     }
     headers = {
         "Accept": "application/json"
     }
 
+    
     req = Request(url, urlencode(data).encode(), headers)
     response = urlopen(req).read().decode()
 
@@ -59,13 +62,6 @@ def generate_access_token(client_id, client_secret, redirect_uri, code):
     except urllib.request.HTTPError as http_err:
         raise http_err
     
-client_id = "Iv1.84422fa8f410b93b"
-client_secret = "8bce57a36f74e7d208ac040b67df5db1e3bc3f36"
-redirect_uri = "https://github.com/valariembithe/Git_Spy_v2"
-code = ""
-
-token_response = generate_access_token(client_id, client_secret, redirect_uri, code)
-print(token_response)
 
 def parse_response(response):
     """ Parse a response and handle errors"""
@@ -98,4 +94,5 @@ def main():
  
 
 if __name__ == "__main__":
+    app.run(debug=True)
     main()
