@@ -20,8 +20,7 @@ client_secret = "8bce57a36f74e7d208ac040b67df5db1e3bc3f36"
 state = "creatingagithubapp"
 redirect_uri = "https://github.com/valariembithe?tab=repositories"
 
-github_authorize_url = f"https://github.com/login/oauth/authorize?
-                    client_id={client_id}&redirect_uri={redirect_uri}&state={state}"
+github_authorize_url = f"https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&state={state}"
 app.route('/')
 def home():
     return f'<a href="{github_authorize_url}">Authorize with GitHub</a>'
