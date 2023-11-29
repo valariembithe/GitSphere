@@ -6,6 +6,7 @@ from json import JSONDecoder
 from json import JSONEncoder
 from json import JSONDecodeError
 import json
+from os import getenv
 import sys
 import requests
 from urllib.parse import urlencode
@@ -14,6 +15,8 @@ import urllib.request
 
 
 app = Flask(__name__)
+host = getenv('0.0.0.0')
+port = getenv('5000')
 
 client_id = "Iv1.84422fa8f410b93b"
 client_secret = "8bce57a36f74e7d208ac040b67df5db1e3bc3f36"
@@ -88,5 +91,5 @@ def main():
  
 
 if __name__ == "__main__":
+    app.run(host=host, port=port, threaded=True)
     app.run(debug=True)
-    main()
