@@ -1,2 +1,2 @@
-# Git_Spy_v2
+# GitSphere
 Building Portfolio Project
