@@ -1,7 +1,4 @@
-""" Create an application that handles full-ledged login
-    authenticates users with Github, 
-    retrieve info about a user and their repositories
-"""
+#!/usr/bin/python3
 
 
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -64,6 +61,71 @@ def authorize():
 @github.tokengetter
 def get_github_auth_token():
     return session.get('github_token')
+
+@app.route('/user')
+def get_authenticated_user():
+    """ A function that retrieves the information of a user using username"""
+    access_token = session.get('github_token')
+
+    if access_token is None:
+        return "Error: Github access token not found. Please Log in"
+    headers = {'Authorization' : f'Bearer {access_token[0]}'}
+    api_url = f'https://api.github.com/user'
+
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        user_data = response.json()
+        return render_template('user_profile.html', user_data=user_data)
+    else:
+         f'Error: Unable to fetch user data from GitHub API. Status code: {response.status_code}'
+
+@app.route('/user/<username>')
+def get_user_details(username):
+    access_token = session.get('github_token')
+
+    if access_token is None:
+        return "Error: Github access token not found. Please Log in."
+    headers = {'Authorization': f'Bearer {access_token[0]}'}
+    api_url = f'https://api.github.com/user/{username}
+    
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        user_data = response.json()
+        name = user_data.get('name', 'N/A')
+        bio = user_data.get('bio', 'N/A')
+        followers = user_data.get('followers', 'N/A')
+        following = user_data.get('following', 'N/A')
+
+        return render_template('user_data.html',
+                               username=username,
+                               name=name,
+                               bio=bio,
+                               followers=followers,
+                               following=following)
+    elif response.status_code == 404:
+        return f'User "{username}" not found on GitHub.'
+    else:
+        return f'Error: Unable to fetch data from GitHub API. Status code: {response.status_code}'
+
+    
+@app.route('/user/<username>/repositories')
+def get_user_repositories(username):
+    access_token = session.get('github_token')
+
+    if access_token is None:
+        return "Error: Github access token not found. Please Log in."
+    headers = {'Authorization': f'Bearer {access_token[0]}'}
+    repos_api_url = f'https://api.github.com/user/{username}/repos'
+
+    response = requests.get(repos_api_url, headers=headers)
+    if response.status_code == 200:
+        repositories = response.json()
+        x =  repositories.get('user', 'N/A')
+        return render_template('user_repos.html',
+                               username=username,
+                               repositories=repositories)
+    else:
+        return f'Error: Unable to fetch repositories from GitHub API. Status code: {response.status_code}'
 
 
 if __name__ == "__main__":
