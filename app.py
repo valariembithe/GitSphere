@@ -37,7 +37,7 @@ def home():
 @app.route('/login')
 def login():
     """ Login page with Github using OAuth """
-    return github.authorize(callback=url_for('authorized', _external=True))
+    return github.authorize(callback=url_for('authorize', _external=True))
 
 @app.route('/logout')
 def logout():
@@ -86,7 +86,7 @@ def get_user_details(username):
     if access_token is None:
         return "Error: Github access token not found. Please Log in."
     headers = {'Authorization': f'Bearer {access_token[0]}'}
-    api_url = f'https://api.github.com/user/{username}
+    api_url = f'https://api.github.com/user/{username}'
     
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
@@ -130,4 +130,4 @@ def get_user_repositories(username):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-    app.run()
+    # app.run()
