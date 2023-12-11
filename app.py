@@ -9,6 +9,8 @@ from urllib.parse import quote as url_quote
 import requests
 
 
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -128,6 +130,45 @@ def get_user_repositories(username):
         return f'Error: Unable to fetch repositories from GitHub API. Status code: {response.status_code}'
 
 
+@app.route('/repos/<owner>/<repo>/issues/<int:issue_number>', methods=['GET'])
+def get_repository_issue(owner, repo, issue_number):
+  
+    access_token = session.get('github_token')
+
+    if access_token is None:
+        return "Error: Github access token not found. Please Log in."
+    headers = {'Authorization': f'Bearer {access_token[0]}'}
+    issues_api_url = f'https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}'
+
+    response = requests.get(issues_api_url, headers=headers)
+    if response.status_code == 200:
+        issue_data = response.json()
+        return render_template('issue_details.html', issue_data=issue_data)
+    else:
+        return f'Error: Unable to fetch issue from GitHub API. Status code: {response.status_code}'
+
+@app.route('/repos/<owner>/<repo>/issues', methods=['POST'])
+def create_repository_issue(owner, repo):
+
+    access_token = session.get('github_token')
+
+    if access_token is None:
+        return "Error: Github access token not found. Please Log in."
+    headers = {'Authorization': f'Bearer {access_token[0]}'}
+    issues_api_url = f'https://api.github.com/repos/{owner}/{repo}/issues'
+    
+    data = {
+        'title': request.form['title'],
+        'body': request.form['body']
+    } 
+
+    response = requests.post(issues_api_url, headers=headers, json=data)
+    if response.status_code == 201:
+        return redirect(url_for('get_repository_issue', owner=owner, repo=repo))
+    else:
+        return f'Error: Unable to create issue on GitHub. Status code: {response.status_code}'
+    
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-    # app.run()
+    app.run(debug=True)
