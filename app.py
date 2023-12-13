@@ -1,11 +1,16 @@
 #!/usr/bin/python3
+""" 
+    This application uses Github OAuth Apps to create an app that uses GitHub API
+    Params needed are client_ID, client_secret 
+    Functions it can perform are retrieve user profile details, perform search,
+    view repository details and statistics
 
+"""
 
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_oauthlib.client import OAuth
 import os
 from dotenv import load_dotenv
-from urllib.parse import quote as url_quote
 import requests
 
 
@@ -18,7 +23,7 @@ app.secret_key = os.urandom(24) #crypographic key that uses Flask to secure sess
 
 oauth = OAuth(app)
 
-#creates as an instance of Oauth remote app and specifies parameters
+#creates as an instance of OAuth remote app and specifies parameters
 github = oauth.remote_app(
     'github',
     consumer_key=os.environ.get('GITHUB_CLIENT_ID'),
@@ -33,22 +38,36 @@ github = oauth.remote_app(
 
 @app.route('/')
 def home():
-    """ Landing page """
-    return "Welcome to Github Web Service!"
+    """ Return welcome message """
+    return "Welcome to GitSphere - Github Insights Web Service!"
 
 @app.route('/login')
 def login():
-    """ Login page with Github using OAuth """
+    """ 
+        Redirects the user to GitHub for authentication.
+        Github asks the end user to authorize/give permission to
+        this application and prompts a login with GitHub
+    """
     return github.authorize(callback=url_for('authorize', _external=True))
 
 @app.route('/logout')
 def logout():
-    """ logout of app """
+    """  
+        Logs the user out by clearing the session 
+        and redirects to home page. 
+    """
     session.pop('github_token', None)
     return redirect(url_for('home'))
 
 @app.route('/login/authorize')
 def authorize():
+    """
+        Callback route for handling the GitHub authorization response.
+        If user authorizes the application, an access_token will be generated
+        which is stored in variable 'github_token'
+        Else if no response or access_token app will return an error message 'Access Denied'
+        and redirects to home page
+    """
     response = github.authorized_response()
     if response is None or response.get('access_token') is None:
         return 'Access denied: reason={} error={}'.format(
@@ -62,11 +81,20 @@ def authorize():
 
 @github.tokengetter
 def get_github_auth_token():
+    """
+        The decorator specifies a function 
+        that retrieves the GitHub access token from the session.
+    """
     return session.get('github_token')
 
 @app.route('/user')
 def get_authenticated_user():
-    """ A function that retrieves the information of a user using username"""
+    """ 
+        This route fetches information about the authenticated user using the GitHub API.
+        Returns: 
+                A template containing relevant info about the user eg: username, bio...
+                Raises error if status code is not 200 OK
+    """
     access_token = session.get('github_token')
 
     if access_token is None:
@@ -83,6 +111,15 @@ def get_authenticated_user():
 
 @app.route('/user/<username>')
 def get_user_details(username):
+    """
+        Params: 
+            username - a valid GitHub username
+        Retrieves access_token to validated and returns error message if None
+        Returns:  Information about a specific user.
+                else: raises an error for 404 Not found
+                handles other errors
+    """
+
     access_token = session.get('github_token')
 
     if access_token is None:
@@ -112,6 +149,13 @@ def get_user_details(username):
     
 @app.route('/user/<username>/repositories')
 def get_user_repositories(username):
+    """
+        Params: 
+            username - a valid GitHub username
+        Includes access_token in headers and uses get method
+        Returns: 
+            Repositories for a specified user
+    """
     access_token = session.get('github_token')
 
     if access_token is None:
@@ -122,7 +166,6 @@ def get_user_repositories(username):
     response = requests.get(repos_api_url, headers=headers)
     if response.status_code == 200:
         repositories = response.json()
-        x =  repositories.get('user', 'N/A')
         return render_template('user_repos.html',
                                username=username,
                                repositories=repositories)
@@ -132,6 +175,14 @@ def get_user_repositories(username):
 
 @app.route('/repos/<owner>/<repo>/issues/<int:issue_number>', methods=['GET'])
 def get_repository_issue(owner, repo, issue_number):
+    """
+        Params:
+            owner: Authenticated GitHub user and owner for specific repository
+            repo: Target repository to retrieve issues
+            issue_number: A specific issue identified by a unique id
+        Returns: 
+             Details for a specific issue in a repository.
+    """
   
     access_token = session.get('github_token')
 
@@ -149,6 +200,13 @@ def get_repository_issue(owner, repo, issue_number):
 
 @app.route('/repos/<owner>/<repo>/issues', methods=['POST'])
 def create_repository_issue(owner, repo):
+    """
+        Params:
+            owner: Authenticated GitHub user and owner for specific repository
+            repo: Target repository to post an issues
+        Returns:
+            A template with the posted issue and the other issues for the repo
+    """
 
     access_token = session.get('github_token')
 

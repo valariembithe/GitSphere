@@ -13,7 +13,7 @@ class User:
     def fetch_user_data(self, access_token):
         """ retrieves and returns info of an authenticated user"""
         headers = {'Authorization': f'Bearer {access_token}'}
-        response = requests.get(self.repos_url, headers=headers)
+        response = requests.get(self.api_url, headers=headers)
 
         if response.status_code == 200:
             self.__user_data = response.json()
@@ -25,7 +25,7 @@ class User:
     def fetch_user_repositories(self, access_token):
         """ retrieves and returns repos of an authenticated user"""
         headers = {'Authorization': f'Bearer {access_token}'}
-        response = requests.get(self.api_url, headers=headers)
+        response = requests.get(self.repos_url, headers=headers)
 
         if response.status_code == 200:
             self.__repositories = response.json()
