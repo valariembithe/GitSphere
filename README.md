@@ -15,7 +15,7 @@ Here is the link to the [deployed website]().
 
 ## Installation
 
-To use Gitsphere, there are `commands` that are key and need to be used to experience the amazing of this application.
+To use Gitsphere, there are `commands` that are key and need to be used to experience the amazing features of this application.
 1. Open a browser, and type the URL for this application in the search button and press **Enter**.
 2. This will prompt the application to navigate to the **home** page, route '/'
   - This page return a welcome message
@@ -31,7 +31,7 @@ Now that youn have granted permissions to **GitSphere** and **Logged in using yo
 3. Endpoint `/user/<username>/repositories`
    - This endpoint returns the repositories for the specified GitHub user using their username. 
 4. Endpoint `/logout`
-   - This endpoint logout a user and clears out the session stored. This makes it more secure to use the application.
+   - This endpoint logs out a user and clears out the session stored. This makes it more secure to use the application.
 
 ## Contributing
 This project was done by 2 software engineers which is part of the **Holberton School - Building your porfolio project**.
