@@ -18,7 +18,8 @@ Here is the link to the [deployed website]().
 To use Gitsphere, there are `commands` that are key and need to be used to experience the amazing of this application.
 1. Open a browser, and type the URL for this application in the search button and press **Enter**.
 2. This will prompt the application to navigate to the **home** page, route '/'
-  - This page return a welcome message > Welcome to GitSphere - Github Insights Web Service!
+  - This page return a welcome message
+    > Welcome to GitSphere - Github Insights Web Service!
 3. To use this web application, the user has to **give permission** to the application and will be prompted to **Login with GitHub**. 
 
 ## Usage
